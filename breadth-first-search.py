@@ -24,10 +24,11 @@ from queue import Queue
 test = ["a","b","c","d","e","f"]
 
 
-class explore:
-    def __init__(self,size,list):
+class breadth_first_search:
+    def __init__(self,size,list,frontier):
         self.size = size
         self.list = list
+        self.frontier = frontier
 
     def queue(self):
         listin = self.list
@@ -35,6 +36,11 @@ class explore:
         while listin is not None:
             firstque =  listin.pop(0) 
             bfs.put(firstque)
+        return firstque
+    def explore(self,q_exp,frontier,end):
+         frontier.put(q_exp.pop(0))
+         if q_exp.empty() or  frontier(0) == end:
+            print("end of breadth_first_search")
      
 class frontier:
         pass
