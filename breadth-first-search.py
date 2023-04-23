@@ -19,30 +19,74 @@ from queue import Queue
 # qsize() – Return the number of items in the queue.
 
 
+class Node:
+    def __init__(self, pos: int, parent, cost: int):
+        self.pos = pos
+        self.parent = parent
+        self.cost = cost
 
-#lista teste
-test = ["a","b","c","d","e","f"]
+    def __repr__(self):
+        return f"Node(state={self.pos}, parent={self.parent}, pos={self.pos} cost={self.cost})"
 
 
-class breadth_first_search:
-    def __init__(self,size,list,frontier):
-        self.size = size
-        self.list = list
-        self.frontier = frontier
+class BreadthFirstSearch:
+    def __init__(self, board: str, start: int, width: int = 10, height: int = 10):
+        self.explored = []
+        self.start = start
+        self.width = width
+        self.height = height
+        self.result = self.search(board)
 
-    def queue(self):
-        listin = self.list
-        bfs = Queue(maxsize = self.size)
-        while listin is not None:
-            firstque =  listin.pop(0) 
-            bfs.put(firstque)
-        return firstque
-    def explore(self,q_exp,frontier,end):
-         frontier.put(q_exp.pop(0))
-         if q_exp.empty() or  frontier(0) == end:
-            print("end of breadth_first_search")
-     
-class frontier:
-        pass
-class dequeue:
-        pass
+    def search(self, board: str):
+        FINAL_STATE = "t"
+
+        node = Node(board.index('s'), None, 0)
+
+        self.frontier = Queue(maxsize=self.width * self.height)
+        self.frontier.put(node)
+        while True:
+            if self.frontier.empty():
+                return None
+            
+            candidate = self.frontier.get()
+            if board[candidate.pos] == FINAL_STATE:
+                solution = []
+                while candidate:
+                    solution.append(candidate.pos)
+                    candidate = candidate.parent
+                return solution[-2::-1]
+
+            if candidate.pos not in self.explored:
+                self.explored.append(candidate.pos)
+                for child in self.expand(candidate):
+                    self.frontier.put(child)
+        
+    def expand(self, node: Node):
+        sucessors = self.sucessor(node.pos)
+        children = [Node(pos, node, node.cost + 1) for pos in sucessors.values()]
+        return children
+
+    def sucessor(self, pos: int) -> dict:
+        sucessors = {}
+
+        if (pos + 1) % self.width != 0:
+            sucessors["right"] = pos + 1
+        
+        if (pos - 1) % self.width != 0:
+            sucessors["left"] = pos - 1
+
+        if (pos - self.width) >= 0:
+            sucessors["up"] = pos - self.width
+        
+        if (pos + self.width) < self.height * self.width:
+            sucessors["down"] = pos + self.width
+
+        return sucessors
+
+initial_state = "eeeeeeeeeteseeeeeeee"
+height = 4
+width = 5
+start = 11
+
+bfs = BreadthFirstSearch(initial_state, start, width, height)
+print(bfs.result)
